@@ -9,3 +9,5 @@ __pycache__/
 .env.local
 .env.*.local
 !.env.example
+.venv*
+db.sqlite3
