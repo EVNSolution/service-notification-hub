@@ -19,7 +19,7 @@ class NotificationApiTests(TestCase):
         self.user_token = self._issue_token("user", self.user_account_id)
         self.other_user_token = self._issue_token("user", self.other_account_id)
 
-    def _issue_token(self, role: str, account_id: str) -> str:
+    def _issue_token(self, role: str, account_id: str, *, allowed_nav_keys: list[str] | None = None) -> str:
         now = datetime.now(timezone.utc)
         payload = {
             "sub": account_id,
@@ -32,6 +32,8 @@ class NotificationApiTests(TestCase):
             "jti": str(uuid4()),
             "type": "access",
         }
+        if allowed_nav_keys is not None:
+            payload["allowed_nav_keys"] = allowed_nav_keys
         return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
 
     def _authenticate(self, token: str) -> None:
@@ -115,6 +117,15 @@ class NotificationApiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["device_key"], "device-b")
+
+    def test_admin_without_notifications_nav_key_is_denied(self) -> None:
+        self._create_token(account_id=self.user_account_id, device_key="device-a")
+        self._authenticate(self._issue_token("admin", self.admin_account_id, allowed_nav_keys=[]))
+
+        response = self.client.get("/general/")
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.data["message"], "This API is not allowed by current navigation policy.")
 
     def test_user_can_read_and_mark_own_inbox_notification(self) -> None:
         own_notification = self._create_notification(recipient_account_id=self.user_account_id)

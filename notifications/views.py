@@ -16,6 +16,7 @@ except ModuleNotFoundError:
         return decorator
 
 from notifications.models import GeneralNotification, PushDeliveryLog, PushTokenRegistration
+from notifications.permissions_navigation import require_nav_access
 from notifications.permissions import AuthenticatedNotificationAccess, AdminOnlyAccess, is_admin
 from notifications.serializers import (
     GeneralNotificationSerializer,
@@ -40,6 +41,8 @@ class PushTokenListCreateView(generics.ListCreateAPIView):
     permission_classes = [AuthenticatedNotificationAccess]
 
     def get_queryset(self):
+        if self.request.method.lower() == "get":
+            require_nav_access(self.request, "notifications")
         queryset = PushTokenRegistration.objects.all()
         user = self.request.user
 
@@ -79,6 +82,8 @@ class PushTokenDetailView(
     http_method_names = ["get", "patch", "options", "head"]
 
     def get_queryset(self):
+        if self.request.method.lower() == "get":
+            require_nav_access(self.request, "notifications")
         queryset = PushTokenRegistration.objects.all()
         if is_admin(self.request.user):
             return queryset
@@ -96,6 +101,8 @@ class GeneralNotificationListCreateView(generics.ListCreateAPIView):
     permission_classes = [AuthenticatedNotificationAccess]
 
     def get_queryset(self):
+        if self.request.method.lower() == "get":
+            require_nav_access(self.request, "notifications")
         queryset = GeneralNotification.objects.all()
         user = self.request.user
 
@@ -137,6 +144,8 @@ class GeneralNotificationDetailView(
     http_method_names = ["get", "patch", "options", "head"]
 
     def get_queryset(self):
+        if self.request.method.lower() == "get":
+            require_nav_access(self.request, "notifications")
         queryset = GeneralNotification.objects.all()
         if is_admin(self.request.user):
             return queryset
@@ -228,6 +237,7 @@ class PushDeliveryLogListView(generics.ListAPIView):
     permission_classes = [AdminOnlyAccess]
 
     def get_queryset(self):
+        require_nav_access(self.request, "notifications")
         queryset = PushDeliveryLog.objects.select_related("push_token", "inbox_notification").all()
 
         delivery_status = self.request.query_params.get("delivery_status")
