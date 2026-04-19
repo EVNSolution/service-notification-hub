@@ -1,0 +1,11 @@
+{
+  "workload_id": "service-notification-hub",
+  "workload_class": "core-api",
+  "entry_impact": false,
+  "public_api_contract_impact": false,
+  "read_model_impact": false,
+  "async_event_impact": false,
+  "runtime_config_gate": false,
+  "depends_on_workloads": [],
+  "expands_to_workloads": []
+}
