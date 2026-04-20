@@ -64,3 +64,9 @@
 - `../../docs/mappings/`
 - `../../docs/runbooks/ev-dashboard-ui-smoke-and-decommission.md`
 - `../../docs/decisions/specs/2026-03-29-notification-hub-phase-1-activation-design.md`
+
+## Root Development Whitelist
+
+- 이 repo는 `clever-msa-platform` root `development/` whitelist에 포함된다.
+- root visible set은 `front-web-console`, `edge-api-gateway`, `runtime-prod-release`, `runtime-prod-platform`, active `service-*` repo만 유지한다.
+- local stack support repo, legacy infra repo, bridge lane repo는 root `development/` whitelist 바깥에서 관리한다.
